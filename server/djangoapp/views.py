@@ -45,22 +45,70 @@ def contact(request):
     return render(request, 'djangoapp/contact.html', context)
 
 # Create a `login_request` view to handle sign in request
-# def login_request(request):
-# ...
+def old_login_request(request):
+    # Assuming user authentication was successful
+    user = authenticate(username=request.user.username, password=request.user.password)
+    if user is not None:
+        print(f'{user.username} was just logged in')
+        login(request, user)
+    else:
+        print(f'There was an error while trying to login.')
+
+def login_request(request):
+    print('this shit')
+    print(request)
+    context = {}
+    # Handles POST request
+    if request.method == "POST":
+        # Get username and password from request.POST dictionary
+        username = request.POST['username']
+        password = request.POST['psw']
+        # Try to check if provide credential can be authenticated
+        user = authenticate(username=username, password=password)
+        print('user', user)
+        if user is not None:
+            # If user is valid, call login method to login current user
+            print('logging in')
+            login(request, user)
+            redirect('djangoapp:index')
+        else:
+            # If not, return to login page again
+            error_message = 'Invalid username or password.'
+            return render(request, 'djangoapp/registration.html', context)
+        return redirect('djangoapp:index')
+    else:
+        return render(request, 'djangoapp/registration.html', context)
 
 # Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+def logout_request(request):
+    # Get the user object based on session id in request
+    print("Log out the user `{}`".format(request.user.username))
+    # Logout user in the request
+
+    logout(request)
+    # Redirect user back to course list view
+    return redirect('djangoapp:index')
 
 # Create a `registration_request` view to handle sign up request
-# def registration_request(request):
-# ...
+def registration_request(request):
+    # Your view logic goes here
+
+    # Context data to pass to the template
+    context = {
+        'variable1': 'Hello',
+        'variable2': 'World!'
+    }
+
+    # Render the template with the given context
+    return render(request, 'djangoapp/registration.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     context = {}
-    if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
+    print(f'method --> {request.method}')
+    # if request.method == "GET":
+        # return render(request, 'djangoapp/index.html', context)
+    return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -70,4 +118,3 @@ def get_dealerships(request):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-

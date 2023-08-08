@@ -33,28 +33,49 @@ class CarModel(models.Model):
 
 
 class CarDealer:
-    def __init__(self, dealer_id, name, location, contact):
-        self.dealer_id = dealer_id
-        self.name = name
-        self.location = location
-        self.contact = contact
-
+    def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip):
+        # Dealer address
+        self.address = address
+        # Dealer city
+        self.city = city
+        # Dealer Full Name
+        self.full_name = full_name
+        # Dealer id
+        self.id = id
+        # Location lat
+        self.lat = lat
+        # Location long
+        self.long = long
+        # Dealer short name
+        self.short_name = short_name
+        # Dealer state
+        self.st = st
+        # Dealer zip
+        self.zip = zip
     def __str__(self):
-        return f"{self.name} - {self.location}"
+        return "Dealer name: " + self.full_name
 
 class DealerReview:
-    def __init__(self, review_id, dealer_id, review_text, rating, reviewer_name, review_date):
-        self.review_id = review_id
-        self.dealer_id = dealer_id
-        self.review_text = review_text
-        self.rating = rating
-        self.reviewer_name = reviewer_name
-        self.review_date = review_date
+    def __init__(self, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, sentiment, id):
+        self.dealership = dealership
+        self.name = name
+        self.purchase = purchase
+        self.review = review
+        self.purchase_date = purchase_date
+        self.car_make = car_make
+        self.car_model = car_model
+        self.car_year = car_year
+        self.sentiment = sentiment
+        self.id = id
 
     def __str__(self):
-        return f"Review ID: {self.review_id}\n" \
-               f"Dealer ID: {self.dealer_id}\n" \
-               f"Review Text: {self.review_text}\n" \
-               f"Rating: {self.rating}\n" \
-               f"Reviewer Name: {self.reviewer_name}\n" \
-               f"Review Date: {self.review_date}"
+        return f"ID: {self.id}\n" \
+               f"Dealership: {self.dealership}\n" \
+               f"Name: {self.name}\n" \
+               f"Purchase: {self.purchase}\n" \
+               f"Review: {self.review}\n" \
+               f"Purchase Date: {self.purchase_date}\n" \
+               f"Car Make: {self.car_make}\n" \
+               f"Car Model: {self.car_model}\n" \
+               f"Car Year: {self.car_year}\n" \
+               f"Sentiment: {self.sentiment}"

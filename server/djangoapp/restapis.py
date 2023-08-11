@@ -2,45 +2,87 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+
+API_KEY = "cweLMsiMGq4xdfSrZEoAwt5fhnbNUe9LQbqxh07f2s7F"
+SERVICE_URL = "https://c9a85a36-e64f-40a1-a6a6-797774dbc9f8-bluemix.cloudantnosqldb.appdomain.cloud"
+
+# def get_request(url, **kwargs):
+#     print('kwargs', kwargs)
+#     print("GET from {} ".format(url))
+#     api_key = "cweLMsiMGq4xdfSrZEoAwt5fhnbNUe9LQbqxh07f2s7F"
+#     try:
+#         params = dict()
+#         params["api_key"] = api_key
+#         params["service_url"] = "https://c9a85a36-e64f-40a1-a6a6-797774dbc9f8-bluemix.cloudantnosqldb.appdomain.cloud"
+#         params["user_id"] = kwargs["user_id"]
+#         params["text"] = kwargs["text"]
+#         params["version"] = kwargs["version"]
+#         params["features"] = kwargs["features"]
+#         params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+#         # Call get method of requests library with URL and parameters
+#         if api_key:
+#             response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+#                                     auth=HTTPBasicAuth('apikey', api_key))
+#         else:
+#             response = requests.get(url, params=params, headers={'Content-Type': 'application/json'})
+#         status_code = response.status_code
+#         print("With status {} ".format(status_code))
+#         print("response", response)
+#         print("text", response.text)
+#         json_data = json.loads(response.text)
+#         return json_data
+#     except:
+#         # If any error occurs
+#         print("Network exception occurred")
+#     return None
+
 def get_request(url, **kwargs):
-    print('kwargs', kwargs)
+    print(kwargs)
     print("GET from {} ".format(url))
-
     try:
-        params = dict()
-        params["user_id"] = 15
-        params["IAM_API_KEY"] = "cweLMsiMGq4xdfSrZEoAwt5fhnbNUe9LQbqxh07f2s7F"
-        params["COUCH_URL"] = "https://c9a85a36-e64f-40a1-a6a6-797774dbc9f8-bluemix.cloudantnosqldb.appdomain.cloud"
-        params["text"] = kwargs["text"]
-        params["version"] = kwargs["version"]
-        params["features"] = kwargs["features"]
-        params["return_analyzed_text"] = kwargs["return_analyzed_text"]
         # Call get method of requests library with URL and parameters
-        if api_key:
-            response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-                                    auth=HTTPBasicAuth('apikey', api_key))
-        else:
-            response = requests.get(url, params=params, headers={'Content-Type': 'application/json'})
+        params = {}
+        params["api_key"] = API_KEY
+        params["service_url"] = SERVICE_URL
+        params["dealer_id"] = "dealer_id" in kwargs and kwargs["dealer_id"] or None
+        params["text"] = "text" in kwargs and kwargs["text"] or None
+        params["version"] = "version" in kwargs and kwargs["version"] or None
+        params["features"] = "features" in kwargs and kwargs["features"] or None
+        params["return_analyzed_text"] = "return_analyzed_text" in kwargs and kwargs["return_analyzed_text"] or None
+        if API_KEY:
+            response = requests.get(
+                url,
+                headers={'Content-Type': 'application/json'},
+                params=params,
+                auth=HTTPBasicAuth('apikey', API_KEY))
+        else: 
+            response = requests.get(
+                url,
+                headers={'Content-Type': 'application/json'},
+                params=params)
 
+        status_code = response.status_code
+        print("With status {} ".format(status_code))
+        json_data = json.loads(response.text)
+        return json_data
     except:
         # If any error occurs
         print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
-    print("response", response)
-    print("text", response.text)
-    json_data = json.loads(response.text)
-    return json_data
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
-def post_request(url, **kwargs):
-    print(kwargs)
+def post_request(url, json_payload, **kwargs):
+    print('kwargs', kwargs)
     print("POST from {} ".format(url))
     try:
         # Call post method of requests library with URL and parameters
-        response = requests.post(url, headers={'Content-Type': 'application/json'},
-                                    params=kwargs)
+        params = {}
+        params["api_key"] = API_KEY
+        params["service_url"] = SERVICE_URL
+        print('params', params)
+        response = requests.post(
+            url,
+            params=params)
     except:
         # If any error occurs
         print("Network exception occurred")
@@ -99,28 +141,25 @@ def get_dealers_by_state(url, **kwargs):
 def get_dealer_reviews_from_cf(url, **kwargs):
     dealer_id = kwargs['dealer_id']
     # Call get_request with a URL parameter
-    review_obj.sentiment = analyze_review_sentiments(review_obj.review)
-    print('here')
     reviews = get_request(url)
     print('reviews', reviews)
     results = []
     if reviews:
         for review in reviews:
-            dealership = review['dealership'] or 'TBD - dealership'
-            name = review['name'] or 'TBD - name'
-            purchase = review['purchase'] or 'TBD - purchase'
-            purchase_date = ('purchase_date'in review and review['purchase_date']) or 'TBD - purchase_date'
-            dealer_review = review['review'] or 'TBD - review'
-            car_make = ('car_make'in review and review['car_make']) or 'TBD - car_make'
-            car_model = ('car_model'in review and review['car_model']) or 'TBD - car_model'
-            car_year = ('car_year'in review and review['car_year']) or 'TBD - car_year'
-            sentiment = ('review'in review and analyze_review_sentiments(review['review']) or 'TBD - sentiment'
-            test = ('test'in review and review['test']) or 'TBD - test'
-
-            # removed sentiment
-            results.append(DealerReview(dealership=dealership, name=name, purchase=purchase, review=dealer_review,
-                purchase_date=purchase_date, car_make=car_make, car_model=car_model,
-                car_year=car_year, sentiment=7, id=dealer_id))
+            if 'dealership' in review and review['dealership'] == dealer_id:
+                dealership = ('dealership' in review and review['dealership']) or 'TBD - car_make'
+                name = ('name'in review and review['name']) or 'TBD - car_make'
+                purchase = ('purchase'in review and review['purchase']) or 'TBD - car_make'
+                purchase_date = ('purchase_date' in review and review['purchase_date']) or 'TBD - purchase_date'
+                dealer_review = ('review' in review and review['review']) or 'TBD - review'
+                car_make = ('car_make' in review and review['car_make']) or 'TBD - car_make'
+                car_model = ('car_model' in review and review['car_model']) or 'TBD - car_make'
+                car_year = ('car_year 'in review and review['car_year']) or 'TBD - car_make'
+                sentiment = dealer_review and analyze_review_sentiments(dealer_review) or None
+                # removed sentiment
+                results.append(DealerReview(dealership=dealership, name=name, purchase=purchase, review=dealer_review,
+                    purchase_date=purchase_date, car_make=car_make, car_model=car_model,
+                    car_year=car_year, sentiment=sentiment, id=dealer_id))
     return results
 
 
@@ -128,5 +167,6 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(dealerreview):
+    return 'Neutral'
 
 

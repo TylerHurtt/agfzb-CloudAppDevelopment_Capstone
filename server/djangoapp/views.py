@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related moels
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -75,14 +75,45 @@ def get_dealerships(request):
 
 def get_dealer_details(request, **kwargs):
     dealer_id = kwargs["dealer_id"]
-
+    context = {}
     if request.method == "GET":
         url = f"{CLOUDANT_URL}/get-reviews-node"
         # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url, dealer_id=dealer_id)
         # Return a list of dealer short name
-        return HttpResponse(reviews)
+        context['reviews'] = reviews
+
+    return HttpResponse(reviews)
+    # return render(request, 'djangoapp/registration.html', context)
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    print('-----  add_review  -----')
+    # authenticated = if request.user.is_authenticated
+
+    # if not authenticated:
+    #     return 'Not Authenticated'
+    request.method = "POST"
+    # time, name, dealership, review, purchase
+    if request.method == "POST":
+        review = dict()
+        json_payload = dict()
+        # json_payload["review"] = review
+        json_payload = {
+            "name": "Testy McTestberger",
+            "dealership": 99,
+            "review": "This is a test review.",
+            "purchase": True,
+            "purchase_date": "03/21/2012",
+            "car_make": "Toyota",
+            "car_model": "Corolla",
+            "car_year": 2010
+        }
+        url = f"{CLOUDANT_URL}/post-review-node"
+        print('[ url ]:', url)
+        print('[ json_payload ]:', json_payload)
+        print('[ dealer_id ]:', dealer_id)
+        response = post_request(url, json_payload, dealer_id=dealer_id)
+        print('[ post ]:', response)
+        return HttpResponse(response)
+

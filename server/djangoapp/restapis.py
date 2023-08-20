@@ -118,6 +118,7 @@ def get_dealers_from_cf(url, **kwargs):
             # Get its content in `doc` object
            dealer_obj = create_dealer_obj(dealer)
            results.append(dealer_obj)
+    print('results', results)
     return results
 
 def get_dealers_by_state(url, **kwargs):

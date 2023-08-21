@@ -39,7 +39,7 @@ def login_request(request):
             login(request, user)
             redirect('djangoapp:index')
         else:
-            constext.error_message = 'Invalid username or password.'
+            context.error_message = 'Invalid username or password.'
             return render(request, 'djangoapp/registration.html', context)
         return redirect('djangoapp:index')
     else:
@@ -96,8 +96,7 @@ def get_dealer_details(request, **kwargs):
         # Return a list of dealer short name
         context['reviews'] = reviews
 
-    return HttpResponse(reviews)
-    # return render(request, 'djangoapp/registration.html', context)
+    return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealer_id):

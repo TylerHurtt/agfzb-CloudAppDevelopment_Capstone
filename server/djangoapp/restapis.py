@@ -2,39 +2,13 @@ import requests
 import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 \
+import Features, CategoriesOptions, SentimentOptions, SyntaxOptions, SyntaxOptionsTokens
 
 API_KEY = "cweLMsiMGq4xdfSrZEoAwt5fhnbNUe9LQbqxh07f2s7F"
 SERVICE_URL = "https://c9a85a36-e64f-40a1-a6a6-797774dbc9f8-bluemix.cloudantnosqldb.appdomain.cloud"
-
-# def get_request(url, **kwargs):
-#     print('kwargs', kwargs)
-#     print("GET from {} ".format(url))
-#     api_key = "cweLMsiMGq4xdfSrZEoAwt5fhnbNUe9LQbqxh07f2s7F"
-#     try:
-#         params = dict()
-#         params["api_key"] = api_key
-#         params["service_url"] = "https://c9a85a36-e64f-40a1-a6a6-797774dbc9f8-bluemix.cloudantnosqldb.appdomain.cloud"
-#         params["user_id"] = kwargs["user_id"]
-#         params["text"] = kwargs["text"]
-#         params["version"] = kwargs["version"]
-#         params["features"] = kwargs["features"]
-#         params["return_analyzed_text"] = kwargs["return_analyzed_text"]
-#         # Call get method of requests library with URL and parameters
-#         if api_key:
-#             response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-#                                     auth=HTTPBasicAuth('apikey', api_key))
-#         else:
-#             response = requests.get(url, params=params, headers={'Content-Type': 'application/json'})
-#         status_code = response.status_code
-#         print("With status {} ".format(status_code))
-#         print("response", response)
-#         print("text", response.text)
-#         json_data = json.loads(response.text)
-#         return json_data
-#     except:
-#         # If any error occurs
-#         print("Network exception occurred")
-#     return None
 
 def get_request(url, **kwargs):
     print(kwargs)
@@ -42,7 +16,7 @@ def get_request(url, **kwargs):
     try:
         # Call get method of requests library with URL and parameters
         params = {}
-        params["api_key"] = API_KEY
+        params["api_key"] = "api_key" in kwargs and kwargs['api_key'] or API_KEY
         params["service_url"] = SERVICE_URL
         params["dealer_id"] = "dealer_id" in kwargs and kwargs["dealer_id"] or None
         params["text"] = "text" in kwargs and kwargs["text"] or None
@@ -167,7 +141,21 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-def analyze_review_sentiments(dealerreview):
-    return 'Neutral'
+def analyze_review_sentiments(text):
+    api_key = 'R3iPUaL4O5Z6JSBHCj9jvc9Ws1JnTv_kPA-q66FwRblG'
+    service_url = 'https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/f368f39c-7d0c-4114-a122-66eeb7235d47'
+    authenticator = IAMAuthenticator(api_key)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2022-04-07',
+        authenticator=authenticator
+    )
+
+    natural_language_understanding.set_service_url(service_url)
+
+    response = natural_language_understanding.analyze(
+        text=text,
+        features=Features(sentiment=SentimentOptions())).get_result()
 
 
+    print(json.dumps(response, indent=2))
+    return response['sentiment']['document']['label']

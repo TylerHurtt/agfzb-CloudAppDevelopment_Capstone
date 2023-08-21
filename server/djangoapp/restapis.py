@@ -129,7 +129,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                 dealer_review = ('review' in review and review['review']) or 'TBD - review'
                 car_make = ('car_make' in review and review['car_make']) or 'TBD - car_make'
                 car_model = ('car_model' in review and review['car_model']) or 'TBD - car_make'
-                car_year = ('car_year 'in review and review['car_year']) or 'TBD - car_make'
+                car_year = ('car_year' in review and review['car_year']) or 'TBD - car_year'
                 sentiment = dealer_review and analyze_review_sentiments(dealer_review) or None
                 # removed sentiment
                 results.append(DealerReview(dealership=dealership, name=name, purchase=purchase, review=dealer_review,

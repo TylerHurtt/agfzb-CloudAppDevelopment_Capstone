@@ -32,26 +32,35 @@ class CarModel(models.Model):
         return f'{self.dealer_id} {self.make} {self.name} {self.type} {self.year}'
 
 
-class CarDealer:
-    def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip):
-        # Dealer address
-        self.address = address
-        # Dealer city
-        self.city = city
-        # Dealer Full Name
-        self.full_name = full_name
-        # Dealer id
-        self.id = id
-        # Location lat
-        self.lat = lat
-        # Location long
-        self.long = long
-        # Dealer short name
-        self.short_name = short_name
-        # Dealer state
-        self.st = st
-        # Dealer zip
-        self.zip = zip
+class CarDealer(models.Model):
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=255)
+    # If id is intended to be the primary key, it will be automatically created by Django
+    lat = models.FloatField()
+    long = models.FloatField()
+    short_name = models.CharField(max_length=255)
+    st = models.CharField(max_length=2)
+    zip = models.CharField(max_length=10)
+    # def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip):
+    #     # Dealer address
+    #     self.address = address
+    #     # Dealer city
+    #     self.city = city
+    #     # Dealer Full Name
+    #     self.full_name = full_name
+    #     # Dealer id
+    #     self.id = id
+    #     # Location lat
+    #     self.lat = lat
+    #     # Location long
+    #     self.long = long
+    #     # Dealer short name
+    #     self.short_name = short_name
+    #     # Dealer state
+    #     self.st = st
+    #     # Dealer zip
+    #     self.zip = zip
     def __str__(self):
         return "Dealer name: " + self.full_name
 

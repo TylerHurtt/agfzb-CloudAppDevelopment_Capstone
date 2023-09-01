@@ -20,9 +20,6 @@
             <ul class="nav navbar-nav navbar-right" style="flex-direction: row">
                 {% if user.is_authenticated %}
                 <li>
-                    <a class="btn btn-link" href="{% url 'djangoapp:add_review' %}">Add Review</a>
-                </li>
-                <li>
                     <a class="btn btn-link" href="#">{{user.first_name}} {{user.last_name}} ({{user.username}})</a>
                     <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
                 </li>
@@ -47,23 +44,23 @@
             </ul>
         </div>
     </nav>
-    
+    <h1>Add a review about {{dealer_full_name}} Delearship</h1>
     <form action="{% url 'djangoapp:add_review' dealer_id %}" method="POST">
         {% csrf_token %}
         <div class="form-group">
-            <label for="content">Review Content:</label>
+            <label for="content"><strong>Enter the Review Content:</strong></label>
             <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
         </div>
 
         <div class="form-check">
             <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
             <label class="form-check-label" for="purchasecheck">
-                I have purchased a car from this dealer before.
+                Has purchased the car from test_dealership Dealership? <span style="font-weight: lighter;">(select purchased car information below if checked)</span>
             </label>
         </div>
 
         <div class="form-group">
-            <label for="car">Select a car:</label>
+            <label for="car"><strong>Select your car (model-make-year):</strong></label>
             <select name="car" id="car" class="form-select" required>
                 {% for car in cars %}
                     <option selected value="{{ car.id }}">{{ car.name }}-{{ car.make.name }}-{{ car.year|date:"Y" }}</option>
@@ -72,7 +69,7 @@
         </div>
 
         <div class="form-group">
-            <label for="purchasedate">Purchase Date:</label>
+            <label for="purchasedate"><strong>Select your purchase date:</strong></label>
             <input class="date-own form-control" type="text" name="purchasedate" id="purchasedate">
         </div>
 

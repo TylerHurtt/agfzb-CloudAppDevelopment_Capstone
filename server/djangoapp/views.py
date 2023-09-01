@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-# from .models import related moels
+from .models import CarModel
 from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -101,31 +101,41 @@ def get_dealer_details(request, **kwargs):
 # Create a `add_review` view to submit a review
 def add_review(request, dealer_id):
     print('-----  add_review  -----')
+    print('request', request)
+    print('POST', request.POST)
     # authenticated = if request.user.is_authenticated
 
     # if not authenticated:
     #     return 'Not Authenticated'
-    request.method = "POST"
-    # time, name, dealership, review, purchase
-    if request.method == "POST":
+    if request.method == 'GET':
+        # Query cars based on the dealer id
+        cars = CarModel.objects.filter(dealer_id=dealer_id)
+        context = {
+            'cars': cars,
+            'dealer_id': dealer_id
+        }
+        return render(request, 'djangoapp/add_review.html', context)
+
+    elif request.method == 'POST':
         review = dict()
         json_payload = dict()
-        # json_payload["review"] = review
+        conent = request.POST.get('content')
+        car_id = request.POST.get('car')[0]
+        car = CarModel.objects.get(id=car_id)
+        print('car', car)
         json_payload = {
-            "name": "Testy McTestberger",
-            "dealership": 99,
-            "review": "This is a test review.",
-            "purchase": True,
-            "purchase_date": "03/21/2012",
-            "car_make": "Toyota",
-            "car_model": "Corolla",
-            "car_year": 2010
+            "name": request.POST.get('name'),
+            "dealership": dealer_id,
+            "review": request.POST.get('content'),
+            "purchase": request.POST.get('purchasecheck') == 'on',
+            "purchaseDate": datetime.strptime(request.POST.get('purchasedate'), '%m/%d/%Y').date(),
+            "car_make": car.make.name,
+            "car_model": car.name,
+            "car_year": car.year,
         }
         url = f"{CLOUDANT_URL}/post-review-node"
-        print('[ url ]:', url)
         print('[ json_payload ]:', json_payload)
-        print('[ dealer_id ]:', dealer_id)
         response = post_request(url, json_payload, dealer_id=dealer_id)
         print('[ post ]:', response)
-        return HttpResponse(response)
-
+        return redirect('djangoapp:dealer_details', dealer_id=dealer_id)
+    return HttpResponseNotAllowed(['GET', 'POST'])
